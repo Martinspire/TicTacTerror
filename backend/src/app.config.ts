@@ -1,11 +1,13 @@
-import config from "@colyseus/tools";
-import { monitor } from "@colyseus/monitor";
-import { playground } from "@colyseus/playground";
+import { monitor } from '@colyseus/monitor';
+import { playground } from '@colyseus/playground';
+import config from '@colyseus/tools';
 
 /**
  * Import your Room files
  */
-import { MyRoom } from "./rooms/MyRoom";
+import { LobbyRoom, RelayRoom } from '@colyseus/core';
+import { GameRoom } from './rooms/GameRoom';
+import { MyRoom } from './rooms/MyRoom';
 
 export default config({
 
@@ -14,7 +16,12 @@ export default config({
          * Define your room handlers:
          */
         gameServer.define('my_room', MyRoom);
-
+        gameServer.define('game', GameRoom);
+        gameServer.define('gameRelay', RelayRoom, {
+            maxClients: 4,
+            allowReconnectionTime: 120
+        });
+        gameServer.define('lobby', LobbyRoom);
     },
 
     initializeExpress: (app) => {
@@ -22,24 +29,28 @@ export default config({
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
-        app.get("/hello_world", (req, res) => {
-            res.send("It's time to kick ass and chew bubblegum!");
+        app.get('/christmas', (req, res) => {
+            res.send('Keep the holiday spirit!');
+        });
+        app.get('/cake', (req, res) => {
+            res.send('The cake is a lie!');
         });
 
         /**
          * Use @colyseus/playground
          * (It is not recommended to expose this route in a production environment)
          */
-        if (process.env.NODE_ENV !== "production") {
-            app.use("/", playground);
+        if (process.env.NODE_ENV !== 'production') {
+            app.use('/', playground);
         }
 
         /**
          * Use @colyseus/monitor
          * It is recommended to protect this route with a password
+         * LOL Yolo
          * Read more: https://docs.colyseus.io/tools/monitor/#restrict-access-to-the-panel-using-a-password
          */
-        app.use("/colyseus", monitor());
+        app.use('/colyseus', monitor());
     },
 
 
